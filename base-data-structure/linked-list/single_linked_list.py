@@ -304,6 +304,28 @@ class SingleLinkedList(object):
             node = node.next_node
 
 
+def merge_sorted_list(l1: Node, l2: Node):
+    # 有序链表合并
+    if l1 and l2:
+        p1, p2 = l1, l2
+        fake_head = Node(None)  # 头结点(哨兵)
+        current = fake_head
+        while p1 and p2:
+            if p1.data <= p2.data:
+                current.next_node = p1
+                p1 = p1.next_node
+            else:
+                current.next_node = p2
+                p2 = p2.next_node
+            current = current.next_node  # 节点后移
+
+        current.next_node = p1 if p1 else p2  # 操作最一个包含数据节点
+
+        return fake_head.next_node
+
+    return l1 or l2
+
+
 if __name__ == '__main__':
     logging.basicConfig(format='[%(asctime)s %(filename)s:%(lineno)s] %(message)s',
                         level=logging.INFO,
