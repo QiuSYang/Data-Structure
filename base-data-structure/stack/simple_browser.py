@@ -11,7 +11,7 @@ import sys
 import logging
 
 work_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(work_path)
+sys.path.append(work_path)  # set work path
 from linked_stack import LinkedStack
 
 logger = logging.getLogger(__name__)
