@@ -44,6 +44,27 @@ def factorial_sum(n):
     return sum
 
 
+def perm(arr, start, size, answers=[]):
+    """
+    递归函数中含三个参数，arr：数组；start：起始索引；size：数组所含元素数（也可以理解为结束索引+1）；
+    递归结束的条件，当start和end相同时候
+    具体实现及讲解在代码及注释中
+    """
+    # 定义递归结束的条件，也是打印当前排列
+    if start == size:
+        logger.info(arr)
+        answers.append(arr.copy())  # 结果保存在全局列表中
+    else:
+        # 对数组（start，end）部分第一位元素所有可能进行遍历
+        for index in range(start, size):
+            # 交换第一个元素和数组（start，end）部分的另一个元素
+            arr[index], arr[start] = arr[start], arr[index]
+            # 递归，对确定下一位元素
+            perm(arr, start + 1, size, answers)
+            # 将数组恢复成交换之前
+            arr[index], arr[start] = arr[start], arr[index]
+
+
 if __name__ == '__main__':
     logging.basicConfig(format="[%(asctime)s %(filename)s:%(lineno)s] %(message)s",
                         level=logging.INFO,
@@ -52,3 +73,7 @@ if __name__ == '__main__':
     logger.info("斐波那契结果: {}".format(fibonacci(5)))
     logger.info("阶乘求解: {}".format(factorial(5)))
     logger.info("阶乘求和: {}".format(factorial_sum(5)))
+
+    results = []
+    perm([1, 2, 3], 0, 3, results)
+    logger.info("集合全排列: {}".format(results))
