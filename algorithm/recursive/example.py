@@ -1,5 +1,18 @@
 """
 # 递归的一些实例
+
+分治法的设计思想
+    将一个难以直接解决的大问题，分割成一些规模较小的相同问题，以便各个击破，分而治之。
+    递归就是将大问题分解为很多数据规模较的小问题
+
+递归算法
+    直接或间接调用自身的算法称为递归算法；
+    用函数自身给出定义的函数称为递归函数；
+
+递归的概念
+    每个递归函数都必须有非递归定义的初始值，否则递归函数无法计算；
+    当一个函数及它的一个变量由函数自身定义时，称这个函数为双递归函数；
+    Ackerman函数——双递归函数，其没有非递归定义；
 """
 import os
 import logging
@@ -44,6 +57,27 @@ def factorial_sum(n):
     return sum
 
 
+def perm(arr, start, size, answers=[]):
+    """
+    递归函数中含三个参数，arr：数组；start：起始索引；size：数组所含元素数（也可以理解为结束索引+1）；
+    递归结束的条件，当start和end相同时候
+    具体实现及讲解在代码及注释中
+    """
+    # 定义递归结束的条件，也是打印当前排列
+    if start == size:
+        logger.info(arr)
+        answers.append(arr.copy())  # 结果保存在全局列表中
+    else:
+        # 对数组（start，end）部分第一位元素所有可能进行遍历
+        for index in range(start, size):
+            # 交换第一个元素和数组（start，end）部分的另一个元素
+            arr[index], arr[start] = arr[start], arr[index]
+            # 递归，对确定下一位元素
+            perm(arr, start + 1, size, answers)
+            # 将数组恢复成交换之前
+            arr[index], arr[start] = arr[start], arr[index]
+
+
 if __name__ == '__main__':
     logging.basicConfig(format="[%(asctime)s %(filename)s:%(lineno)s] %(message)s",
                         level=logging.INFO,
@@ -52,3 +86,7 @@ if __name__ == '__main__':
     logger.info("斐波那契结果: {}".format(fibonacci(5)))
     logger.info("阶乘求解: {}".format(factorial(5)))
     logger.info("阶乘求和: {}".format(factorial_sum(5)))
+
+    results = []
+    perm([1, 2, 3], 0, 3, results)
+    logger.info("集合全排列: {}".format(results))
