@@ -64,7 +64,7 @@ def selection_sort(arr: list):
 
     for i in range(arr_len):
         min_index = i
-        min_value = arr[i]
+        min_value = arr[i]  # 设置最小元素的初始值为当前值
         for j in range(i, arr_len):
             if arr[j] < min_value:
                 min_value = arr[j]
