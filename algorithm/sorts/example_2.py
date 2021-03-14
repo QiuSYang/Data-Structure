@@ -1,5 +1,5 @@
 """
-# 归并排序, 快速排序等
+# 归并排序
 """
 import os
 import logging
