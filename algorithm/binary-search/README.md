@@ -160,5 +160,87 @@
 
 1.查找第一个值等于给定值的元素
 
+二分查找最简单的一种，即有序数据集合中不存在重复的数据，我们在其中查找值等于某个给定值的数据。如果我们将这个问题稍微修改下，有序数据集合中存在重复的数据，我们希望找到第一个值等于给定值的数据，这样之前的二分查找代码还能继续工作吗？
+
+比如下面这样一个有序数组，其中，a[5]，a[6]，a[7]的值都等于8，是重复的数据。我们希望查找第一个等于8的数据，也就是下标是5的元素。
+
+![Image text](https://github.com/QiuSYang/Data-Structure/blob/master/algorithm/binary-search/images/5.png)
+
+如果我们用上一节课讲的二分查找的代码实现，首先拿8与区间的中间值a[4]比较，8比6大，于是在下标5到9之间继续查找。下标5和9的中间位置是下标7，a[7]正好等于8，所以代码就返回了。
+
+尽管a[7]也等于8，但它并不是我们想要找的第一个等于8的元素，因为第一个值等于8的元素是数组下标为5的元素。我们上一节讲的二分查找代码就无法处理这种情况了。所以，针对这个变形问题，我们可以稍微改造一下上一节的代码。
+
+代码实现：
+
+    public int bsearch(int[] a, int n, int value) {
+        int low = 0;
+        int high = n - 1;
+        while (low <= high) {
+            // low最终会被定位第一个目标值的位置
+            int mid = low + ((high - low) >> 1);
+            if (a[mid] >= value) {
+                // 目标就是将mid定位到第一目标值索引的前一个位置
+                high = mid - 1;
+            } else {
+                low = mid + 1;
+            }
+        }
+        if (low < n && a[low]==value) return low;
+        else return -1;
+    }
+
+便于理解的代码实现：
+
+    public int bsearch(int[] a, int n, int value) {
+        int low = 0;
+        int high = n - 1;
+        while (low <= high) {
+            int mid = low + ((high - low) >> 1);
+            if (a[mid] > value) {
+                high = mid - 1;
+            } else if (a[mid] < value) {
+                low = mid + 1;
+            } else {
+                if ((mid == 0) || (a[mid - 1] != value)) return mid;  // 说明当前元素就是第一个目标值
+                else high = mid - 1;  // 说明当前元素不是第一目标值, 类似于当前元素大于目标值
+            }
+        }
+        return -1;
+    }
+
+a[mid]跟要查找的value的大小关系有三种情况：大于、小于、等于。对于a[mid] > value的情况，我们需要更新high= mid-1；对于a[mid] < value的情况，我们需要更新low=mid+1。这两点都很好理解。那当a[mid]=value的时候应该如何处理呢？
+
+如果我们查找的是任意一个值等于给定值的元素，当a[mid]等于要查找的值时，a[mid]就是我们要找的元素。但是，如果我们求解的是第一个值等于给定值的元素，当a[mid]等于要查找的值时，我们就需要确认一下这个a[mid]是不是第一个值等于给定值的元素。
+
+我们重点看第11行代码。如果mid等于0，那这个元素已经是数组的第一个元素，那它肯定是我们要找的；如果mid不等于0，但a[mid]的前一个元素a[mid-1]不等于value，那也说明a[mid]就是我们要找的第一个值等于给定值的元素。
+
+如果经过检查之后发现a[mid]前面的一个元素a[mid-1]也等于value，那说明此时的a[mid]肯定不是我们要查找的第一个值等于给定值的元素。那我们就更新high=mid-1，因为要找的元素肯定出现在[low, mid-1]之间。
+
+对比上面的两段代码，是不是下面那种更好理解？实际上，很多人都觉得变形的二分查找很难写，主要原因是太追求第一种那样完美、简洁的写法。而对于我们做工程开发的人来说，代码易读懂、没Bug，其实更重要，所以我觉得第二种写法更好。
+
+2. 查找最后一个值等于给定值的元素
+
+前面的问题是查找第一个值等于给定值的元素，我现在把问题稍微改一下，查找最后一个值等于给定值的元素，又该如何做呢？
+
+如果你掌握了前面的写法，那这个问题你应该很轻松就能解决。你可以先试着实现一下，然后跟我写的对比一下。
+
+代码实现：
+
+    public int bsearch(int[] a, int n, int value) {
+        int low = 0;
+        int high = n - 1;
+        while (low <= high) {
+            int mid = low + ((high - low) >> 1);
+            if (a[mid] > value) {
+                high = mid - 1;
+            } else if (a[mid] < value) {
+                low = mid + 1;
+            } else {
+                if ((mid == n - 1) || (a[mid + 1] != value)) return mid;  // 说明当前元素就是第一个目标值
+                else low = mid + 1;  // 说明当前元素不是第一目标值, 类似于当前元素小于目标值
+            }
+        }
+        return -1;
+    }
 
 
