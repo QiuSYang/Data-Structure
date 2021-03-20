@@ -30,7 +30,7 @@ class LRUCache(object):
 
     def __init__(self, capacity: int):
         self.cap = capacity
-        self.hkeys = {}
+        self.hkeys = {}  # 使用字典加速查询, 不用遍历链表查询某个值是否出现
         # self.top 和 self.tail 作为哨兵节点，避免越界
         self.top = DbListNode(None, -1)
         self.tail = DbListNode(None, -1)
