@@ -56,6 +56,24 @@ class BinarySearchTree(object):
 
         return True
 
+    def search(self, data):
+        """搜索, 范围树中所有为data值的节点列表"""
+        assert isinstance(data, int)
+
+        ret = []  # 存储搜索到的所有节点
+        current = self.root
+        while current:
+            if data < current.val:
+                # 小于data的值只存在于左子树中
+                current = current.right
+            else:
+                # 大于等于data节点只存在于右子树中
+                if data == current.val:
+                    ret.append(current)
+                current = current.right  # 继续向搜索, 直到current节点为None
+
+        return ret
+
 
 if __name__ == '__main__':
     logging.basicConfig(format="[%(asctime)s %(filename)s: %(lineno)s] %(message)s",
