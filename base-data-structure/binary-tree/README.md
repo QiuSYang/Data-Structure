@@ -143,3 +143,128 @@
 
 ## 二叉查找树(Binary Search Tree)
 
+二叉查找树是二叉树中最常用的一种类型，也叫**二叉搜索树**。顾名思义，二叉查找树是为了实现快速查找而生的。不过，它不仅仅支持快速查找一个数据，还支持快速插入、删除一个数据。它是怎么做到这些的呢？
+
+这些都依赖于二叉查找树的特殊结构。二叉查找树要求，在树中的任意一个节点，其**左子树中的每个节点的值，都要小于这个节点的值**，而**右子树节点的值都大于这个节点的值**。 我画了几个二叉查找树的例子，你一看应该就清楚了。
+
+![Image text](https://github.com/QiuSYang/Data-Structure/blob/master/base-data-structure/binary-tree/images/12.png)
+
+前面我们讲到，二叉查找树支持快速查找、插入、删除操作，现在我们就依次来看下，这三个操作是如何实现的。
+
+### 1. 二叉查找树的查找操作
+
+首先，我们看如何在二叉查找树中查找一个节点。我们先取根节点，如果它等于我们要查找的数据，那就返回。如果要查找的数据比根节点的值小，那就在左子树中递归查找；如果要查找的数据比根节点的值大，那就在右子树中递归查找。
+
+![Image text](https://github.com/QiuSYang/Data-Structure/blob/master/base-data-structure/binary-tree/images/13.png)
+
+代码实现如下: 
+
+    public class BinarySearchTree {
+        private Node tree;
+        public Node find(int data) {
+            Node p = tree;
+            while (p != null) {
+                if (data < p.data) p = p.left;
+                else if (data > p.data) p = p.right;
+                else return p;
+            }
+            return null;
+        }
+        public static class Node {
+            private int data;
+            private Node left;
+            private Node right;
+            public Node(int data) {
+                this.data = data;
+            }
+        }
+    }
+
+### 2. 二叉查找树的插入操作
+
+二叉查找树的插入过程有点类似查找操作。新插入的数据一般都是在叶子节点上，所以我们只需要从根节点开始，依次比较要插入的数据和节点的大小关系。
+
+如果要插入的数据比节点的数据大，并且节点的右子树为空，就将新数据直接插到右子节点的位置；如果不为空，就再递归遍历右子树，查找插入位置。同理，如果要插入的数据比节点数值小，并且节点的左子树为空，就将新数据插入到左子节点的位置；如果不为空，就再递归遍历左子树，查找插入位置。
+
+![Image text](https://github.com/QiuSYang/Data-Structure/blob/master/base-data-structure/binary-tree/images/14.png)
+
+代码实现如下:
+
+    public void insert(int data) {
+        if (tree == null) {
+            tree = new Node(data);
+            return;
+        }
+        Node p = tree;
+        while (p != null) {
+            if (data > p.data) {
+                if (p.right == null) {
+                    p.right = new Node(data);
+                    return;
+                }
+                p = p.right;
+                } else { // data < p.data
+                    if (p.left == null) {
+                    p.left = new Node(data);
+                    return;
+                }
+                p = p.left;
+            }
+        }
+    }
+
+### 3. 二叉查找树的删除操作
+
+二叉查找树的查找、插入操作都比较简单易懂，但是它的删除操作就比较复杂了 。针对要删除节点的子节点个数的不同，我们需要分三种情况来处理。
+
+第一种情况是，如果要删除的节点没有子节点，我们只需要直接将父节点中，指向要删除节点的指针置为null。比如图中的删除节点55。
+
+第二种情况是，如果要删除的节点只有一个子节点（只有左子节点或者右子节点），我们只需要更新父节点中，指向要删除节点的指针，让它指向要删除节点的子节点就可以了。比如图中的删除节点13。
+
+第三种情况是，如果要删除的节点有两个子节点，这就比较复杂了。我们需要找到这个节点的右子树中的最小节点，把它替换到要删除的节点上。然后再删除掉这个最小节点，因为最小节点肯定没有左子节点（如果有左子结点，那就不是最小节点了），所以，我们可以应用上面两条规则来删除这个最小节点。比如图中的删除节点18。
+
+![Image text](https://github.com/QiuSYang/Data-Structure/blob/master/base-data-structure/binary-tree/images/15.png)
+
+代码实现：
+
+    public void delete(int data) {
+        Node p = tree; // p指向要删除的节点，初始化指向根节点
+        Node pp = null; // pp记录的是p的父节点
+        while (p != null && p.data != data) {
+            pp = p;
+            if (data > p.data) p = p.right;
+            else p = p.left;
+        }
+        if (p == null) return; // 没有找到
+        // 要删除的节点有两个子节点
+        if (p.left != null && p.right != null) { // 查找右子树中最小节点
+            Node minP = p.right;
+            Node minPP = p; // minPP表示minP的父节点
+            while (minP.left != null) {
+                minPP = minP;
+                minP = minP.left;
+            }
+            p.data = minP.data; // 将minP的数据替换到p中
+            p = minP; // 下面就变成了删除minP了
+            pp = minPP;
+        }
+        // 删除节点是叶子节点或者仅有一个子节点
+        Node child; // p的子节点
+        if (p.left != null) child = p.left;
+        else if (p.right != null) child = p.right;
+        else child = null;
+        if (pp == null) tree = child; // 删除的是根节点
+        else if (pp.left == p) pp.left = child;
+        else pp.right = child;
+    }
+
+实际上，关于二叉查找树的删除操作，还有个非常简单、取巧的方法，就是单纯将要删除的节点标记为“已删除”，但是并不真正从树中将这个节点去掉。这样原本删除的节点还需要存储在内存中，比较浪费内存空间，但是删除操作就变得简单了很多。而且，这种处理方法也并没有增加插入、查找操作代码实现的难度。
+
+### 4. 二叉查找树的其他操作
+
+除了插入、删除、查找操作之外，二叉查找树中还可以支持快速地查找最大节点和最小节点、前驱节点和后继节点。这些操作我就不一一展示了。我会将相应的代码放到GitHub上，你可以自己先实现一下，然后再去上面看。
+
+二叉查找树除了支持上面几个操作之外，还有一个重要的特性，就是**中序遍历**二叉查找树，可以输出有序的数据序列，时间复杂度是O(n)，非常高效。因此，二叉查找树也叫作二叉排序树。
+
+## 支持重复数据的二叉查找树
+
