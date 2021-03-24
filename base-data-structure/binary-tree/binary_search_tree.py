@@ -74,6 +74,10 @@ class BinarySearchTree(object):
 
         return ret
 
+    def delete(self, data):
+        """节点删除"""
+        pass
+
 
 if __name__ == '__main__':
     logging.basicConfig(format="[%(asctime)s %(filename)s: %(lineno)s] %(message)s",
