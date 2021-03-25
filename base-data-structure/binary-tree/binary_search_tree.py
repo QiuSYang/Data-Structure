@@ -141,7 +141,7 @@ class BinarySearchTree(object):
         else:
             min_node = node.right
             # 找到右子树的最小值节点, 右树所有节点都大于左树节点
-            if min_node.left:
+            while min_node.left:
                 min_node = min_node.left
             if node.val != min_node.val:
                 # 当前节点值替换为右树的最小节点, 继续保持当前节点的右数都大于该节点左树所有节点, 小于该节点右树所有节点
