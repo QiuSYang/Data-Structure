@@ -3,6 +3,7 @@
 """
 import os
 import logging
+from collections import deque
 
 logger = logging.getLogger(__name__)
 
@@ -72,6 +73,37 @@ class DirectedGraph(object):
         return str(self.adj_tbl)
 
 
+def find_vertex_by_degree(graph, start_vertex, degree):
+    """通过度查顶点
+       start_vertex: 起始顶点
+    """
+    if len(graph) <= 1:
+        return []
+
+    if degree == 0:
+        return [start_vertex]
+
+    d_vertices = []
+    queue = deque()
+    prev = [-1] * len(graph)
+    visited = [False] * len(graph)
+    visited[start_vertex] = True
+    queue.append(start_vertex)
+    while len(queue) > 0:
+        sz = len(queue)
+        for i in range(sz):
+            v = queue.popleft()
+            for adj_v in graph[v]:
+                if not visited[adj_v]:
+                    prev[adj_v] = v
+                    visited[adj_v] = True
+                    queue.append(adj_v)
+        degree -= 1
+
+        if degree == 0 and len(queue) != 0:
+            return queue
+
+
 if __name__ == '__main__':
     logging.basicConfig(format="[%(asctime)s %(filename)s: %(lineno)s]: %(message)s",
                         datefmt="%Y-%m-%d %H:%M:%S",
@@ -90,3 +122,17 @@ if __name__ == '__main__':
     dg.add_edge(1, 3)
     dg.add_edge(3, 4)
     logger.info("Print adjacency list: {}".format(dg))
+
+    g = UndirectedGraph(8)
+    g.add_edge(0, 1)
+    g.add_edge(0, 3)
+    g.add_edge(1, 2)
+    g.add_edge(1, 4)
+    g.add_edge(2, 5)
+    g.add_edge(3, 4)
+    g.add_edge(4, 5)
+    g.add_edge(4, 6)
+    g.add_edge(5, 7)
+    g.add_edge(6, 7)
+    logger.info(g)
+    logger.info(find_vertex_by_degree(g, 0, 4))
