@@ -74,7 +74,7 @@ class DirectedGraph(object):
 
 
 def find_vertex_by_degree(graph, start_vertex, degree):
-    """通过度查顶点
+    """通过度查顶点(此应用有问题？)
        start_vertex: 起始顶点
     """
     if len(graph) <= 1:

@@ -41,7 +41,7 @@ class Graph(object):
 
         while q:
             v = q.popleft()
-            for neighbour in self._adjacency[v]:
+            for neighbour in self._adjacency[v]:  # 依次访问当前节点的近邻节点
                 if not visited[neighbour]:
                     prev[neighbour] = v  # 记录当前节点的父节点
                     if neighbour == t:
@@ -77,7 +77,7 @@ class Graph(object):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(format="[%(asctime)s %(filename)s: %(lineno)s]: %(message)s",
+    logging.basicConfig(format="[%(asctime)s %(filename)s: %(lineno)s]: %(levelname)s - %(message)s",
                         datefmt="%Y-%m-%d %H:%M:%S",
                         level=logging.INFO,
                         filename=None,
