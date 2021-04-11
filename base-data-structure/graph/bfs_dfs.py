@@ -63,7 +63,7 @@ class Graph(object):
             nonlocal found
             if found:
                 return True
-            visited[from_vertex] = True
+            visited[from_vertex] = True  # 记录当前节点已经被访问
             if from_vertex == t:
                 found = True
                 return True

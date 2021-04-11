@@ -119,3 +119,71 @@
 我们知道，一个包含$n$个节点的完全二叉树，树的高度不会超过$\log_{2}n$。堆化的过程是顺着节点所在路径比较交换的，所以堆化的时间复杂度跟树的高度成正比，也就是$O(\log n)$。插入数据和删除堆顶元素的主要逻辑就是堆化，所以，往堆中插入一个元素和删除堆顶元素的时间复杂度都是$O(\log n)$。
 
 ## 如何基于堆实现排序？
+
+前面我们讲过好几种排序算法，我们再来回忆一下，有时间复杂度是$O(n^{2})$的冒泡排序、插入排序、选择排序，有时间复杂度是$O(n\log n)$的归并排序、快 速排序，还有线性排序。
+
+这里我们借助于堆这种数据结构实现的排序算法，就叫作堆排序。这种排序方法的时间复杂度非常稳定，是$O(n\log n)$，并且它还是原地排序算法。如此优秀， 它是怎么做到的呢？
+
+我们可以把堆排序的过程大致分解成两个大的步骤，**建堆和排序**。
+
+### 1. 建堆
+
+我们首先将数组原地建成一个堆。所谓“原地”就是，不借助另一个数组，就在原数组上操作。建堆的过程，有两种思路。
+
+第一种是借助我们前面讲的，在堆中插入一个元素的思路。尽管数组中包含$n$个数据，但是我们可以假设，起初堆中只包含一个数据，就是下标为$1$的数据。 然后，我们调用前面讲的插入操作，将下标从$2$到$n$的数据依次插入到堆中。这样我们就将包含$n$个数据的数组，组织成了堆。
+
+第二种实现思路，跟第一种截然相反，也是我这里要详细讲的。第一种建堆思路的处理过程是从前往后处理数组数据，并且每个数据插入堆中时，都是**从下往上堆化**。而第二种实现思路，是从后往前处理数组，并且每个数据都是**从上往下堆化**。
+
+我举了一个例子，并且画了一个第二种实现思路的建堆分解步骤图，你可以看下。因为叶子节点往下堆化只能自己跟自己比较，所以我们直接从第一个非叶子节 点开始，依次堆化就行了。
+
+![Image text](https://github.com/QiuSYang/Data-Structure/blob/master/base-data-structure/heap/images/7.png)
+
+![Image text](https://github.com/QiuSYang/Data-Structure/blob/master/base-data-structure/heap/images/8.png)
+
+对于程序员来说，看代码可能更好理解一些，所以，我将第二种实现思路翻译成了代码，你可以看下。
+
+    private static void buildHeap(int[] a, int n) {
+        for (int i = n/2; i >= 1; --i) {
+            heapify(a, n, i);
+        }
+    }
+    private static void heapify(int[] a, int n, int i) {
+        while (true) {
+             int maxPos = i;
+             if (i*2 <= n && a[i] < a[i*2]) maxPos = i*2;
+             if (i*2+1 <= n && a[maxPos] < a[i*2+1]) maxPos = i*2+1;
+             if (maxPos == i) break;
+             swap(a, i, maxPos);
+             i = maxPos;
+        }
+    }
+
+你可能已经发现了，在这段代码中，我们对下标从$\frac{n}{2}$ 开始到$1$的数据进行堆化，下标是$\frac{n}{2}+1$到$n$的节点是叶子节点，我们不需要堆化。实际上，对于完全二叉树来说，下标从$\frac{n}{2}+1$到$n$的节点都是叶子节点。
+
+现在，我们来看，建堆操作的时间复杂度是多少呢？
+
+每个节点堆化的时间复杂度是$O(\log n)$，那$\frac{n}{2}+1$个节点堆化的总时间复杂度是不是就是$O(n\log n)$呢？这个答案虽然也没错，但是这个值还是不够精确。实际上，堆排序的建堆过程的时间复杂度是$O(n)$。我带你推导一下。
+
+因为叶子节点不需要堆化，所以需要堆化的节点从倒数第二层开始。每个节点堆化的过程中，需要比较和交换的节点个数，跟这个节点的高度$k$成正比。
+
+我把每一层的节点个数和对应的高度画了出来，你可以看看。我们只需要将每个节点的高度求和，得出的就是建堆的时间复杂度。
+
+![Image text](https://github.com/QiuSYang/Data-Structure/blob/master/base-data-structure/heap/images/9.png)
+
+我们将每个非叶子节点的高度求和，就是下面这个公式：
+
+![Image text](https://github.com/QiuSYang/Data-Structure/blob/master/base-data-structure/heap/images/10.png)
+
+这个公式的求解稍微有点技巧，不过我们高中应该都学过：把公式左右都乘以$2$，就得到另一个公式$S2$。我们将$S2$错位对齐，并且用$S2$减去$S1$，可以得到$S$。
+
+![Image text](https://github.com/QiuSYang/Data-Structure/blob/master/base-data-structure/heap/images/11.png)
+
+$S$的中间部分是一个等比数列，所以最后可以用等比数列的求和公式来计算，最终的结果就是下面图中画的这个样子。
+
+![Image text](https://github.com/QiuSYang/Data-Structure/blob/master/base-data-structure/heap/images/12.png)
+
+因为$h=\log_{2}n$，代入公式$S$，就能得到$S=O(n)$，所以，建堆的时间复杂度就是$O(n)$。
+
+### 2. 排序
+
+
