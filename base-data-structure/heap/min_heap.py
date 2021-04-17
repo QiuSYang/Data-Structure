@@ -155,7 +155,7 @@ def merge_n_sort_array():
             index_datas[arr_index] = new_val
             min_heap.heappush(new_val)  # 新元素入堆
         except IndexError as e:
-            # 出现索引异常时, 说明数据已经访问完
+            # 出现索引异常时, 说明数据已经访问完, 堆元素减小
             logger.info("Error info: {}".format(e))
             index += 1
             index_datas[arr_index] = None  # 当前数组数据已经访问完, 对应索引数组设置为None
