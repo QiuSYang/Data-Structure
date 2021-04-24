@@ -234,3 +234,62 @@
     3. 两个有序的链表合并
     4. 删除链表倒数第n个结点 --- 快慢指针实现，快指针从链头先走n步，之后快慢指针同事移动，快指针到达链尾，慢指针刚好到达倒数n个节点(因为快慢指针刚好相差n个节点)
     5. 求链表的中间结点 --- 快慢指针实现，快指针步长为2，慢指针步长为1，快指针走到链尾，慢指针就指向链中
+    
+
+## LeetCode-206. 反转链表
+
+    # Definition for singly-linked list.
+    # class ListNode:
+    #     def __init__(self, val=0, next=None):
+    #         self.val = val
+    #         self.next = next
+    class Solution:
+        def reverseList(self, head: ListNode) -> ListNode:
+            """使用递归实现链表反转"""
+            if head is None:
+                return head 
+            if head.next is None:
+                return head 
+            # 细化为单个节点反转
+            lasted = self.reverseList(head.next)  # 反转当前头结点之后的所有节点
+            head.next.next = head  # 后一个节点的next节点等于前一个节点
+            head.next = None  # 断开连接, 原来前一个节点与后一个节点断开连接
+    
+            return lasted 
+            
+## LeetCode-25. K 个一组翻转链表
+
+    # Definition for singly-linked list.
+    # class ListNode:
+    #     def __init__(self, val=0, next=None):
+    #         self.val = val
+    #         self.next = next
+    class Solution:
+        def reverseKGroup(self, head: ListNode, k: int) -> ListNode:
+            if head is None: return None;
+            # 区间 [a, b) 包含 k 个待反转元素
+            a = b = head;
+            for i in range(k):
+                # 不足 k 个，不需要反转，base case
+                if b is None:
+                     return head
+                b = b.next
+            # 反转前 k 个元素
+            newHead = self.reverse(a, b);
+            # 递归反转后续链表并连接起来
+            a.next = self.reverseKGroup(b, k);
+            return newHead;
+    
+        def reverse(self, a: ListNode, b: ListNode) -> ListNode:
+            """反转一个区间内的数组"""
+            pre = None
+            cur = a
+            nxt = a
+            # while 终止的条件改一下就行了
+            while cur != b:
+                nxt = cur.next
+                cur.next = pre
+                pre = cur
+                cur = nxt
+            # 返回反转后的头结点
+            return pre
