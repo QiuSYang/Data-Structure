@@ -256,6 +256,22 @@
             head.next = None  # 断开连接, 原来前一个节点与后一个节点断开连接
     
             return lasted 
+        
+        def _reverseList(self, head: ListNode) -> ListNode:
+            """使用循环的方式"""
+            if head is None:
+                return head 
+            
+            pre, cur, nxt = None, head, head
+            while cur is not None:
+                nxt = cur.next
+                # 逐个结点反转
+                cur.next = pre 
+                # 更新指针位置
+                pre = cur 
+                cur = nxt
+            
+            return pre 
             
 ## LeetCode-25. K 个一组翻转链表
 
@@ -293,3 +309,93 @@
                 cur = nxt
             # 返回反转后的头结点
             return pre
+            
+## LeetCode-92.反转链表II --- 规定范围节点反转
+
+    # Definition for singly-linked list.
+    # class ListNode:
+    #     def __init__(self, val=0, next=None):
+    #         self.val = val
+    #         self.next = next
+    class Solution:
+        successor = ListNode()  # 后驱节点
+        # def reverseBetween(self, head: ListNode, left: int, right: int) -> ListNode:
+        #     """使用循环的方式反转一个链表区间"""
+        #     if head is None:
+        #         return head 
+            
+        #     # 寻找三个节点区间
+        #     index = 1 
+        #     left_node, right_node = None, None 
+        #     temp = head 
+        #     result = ListNode()
+        #     temp_result = result
+        #     while temp is not None:
+        #         if index < left:
+        #             temp_result.next = temp
+        #             temp_result = temp  # 指针移动
+        #         elif index == left:
+        #             left_node = temp
+        #         elif index == right + 1:
+        #             right_node = temp
+        #         index += 1
+        #         temp = temp.next 
+            
+        #     pre, cur, nxt = None, left_node, left_node
+        #     # print(right_node.next)
+        #     while cur is not right_node:
+        #         # print(cur)
+        #         nxt = cur.next
+        #         # 逐个结点反转
+        #         cur.next = pre 
+        #         # 更新指针位置
+        #         pre = cur 
+        #         cur = nxt
+            
+        #     # 两端拼接
+        #     left_node.next = right_node
+        #     temp_result.next = pre 
+    
+        #     return result.next 
+    
+        def reverse_n(self, head: ListNode, n: int) -> ListNode:
+            """反转前n个节点"""
+            # 反转以 head 为起点的 n 个节点，返回新的头结点
+            if n == 1:
+                self.successor = head.next
+                return head   # 最后一个节点
+            
+            lasted = self.reverse_n(head.next, n - 1)
+            head.next.next = head  # 两个节点对调
+            # 让反转之后的 head 节点和后面的节点连起来
+            head.next = self.successor 
+    
+            return lasted 
+    
+        def reverseBetween(self, head: ListNode, left: int, right: int) -> ListNode:
+            """使用递归方式反转规定范围内的节点"""
+            if head is None:
+                return head 
+            if left == 1:
+                # 左节点到达作为头节点
+                return self.reverse_n(head, right)
+            
+            # 寻找以Left位置为head node 子链表, 转换为一个反转前N个节点的问题
+            head.next = self.reverseBetween(head.next, left-1, right-1)
+    
+            return head 
+            
+## LeetCode-9.回文数 --- 双指针法
+
+    class Solution:
+        def isPalindrome(self, x: int) -> bool:
+            """双指针判断是否为回文字符"""
+            x = str(x)
+            left, right = 0, len(x)-1
+            while left < right:
+                if x[left] != x[right]:
+                    return False
+                left += 1 
+                right -= 1
+    
+            return True 
