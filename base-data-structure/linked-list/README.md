@@ -399,3 +399,104 @@
                 right -= 1
     
             return True 
+
+## 链表其实也可以有前序遍历和后序遍历
+
+    void traverse(ListNode head) {
+        // 前序遍历代码
+        if head is None:
+            return 
+        print(head.val)
+        traverse(head.next);
+    }
+
+    /* 倒序打印单链表中的元素值 */
+    void traverse(ListNode head) {
+        if (head == null) return;
+        traverse(head.next);
+        // 后序遍历代码
+        print(head.val);
+    }
+
+模仿双指针实现回文判断的功能
+
+    # Definition for singly-linked list.
+    # class ListNode:
+    #     def __init__(self, val=0, next=None):
+    #         self.val = val
+    #         self.next = next
+    class Solution:
+        left = ListNode()  # 左指针
+        def isPalindrome(self, head: ListNode) -> bool:
+            if head is None:
+                return True 
+            self.left = head 
+            return self.traverse(head)
+    
+        def traverse(self, right: ListNode) -> bool:
+            """链表逆序访问"""
+            if right is None: return True 
+            res = self.traverse(right.next)
+    
+            res = res and right.val == self.left.val
+            self.left = self.left.next 
+    
+            return res 
+
+这么做的核心逻辑是什么呢？**实际上就是把链表节点放入一个栈，然后再拿出来，这时候元素顺序就是反的**，只不过我们利用的是递归函数的堆栈而已。
+
+    # Definition for singly-linked list.
+    # class ListNode:
+    #     def __init__(self, val=0, next=None):
+    #         self.val = val
+    #         self.next = next
+    class Solution:
+        def isPalindrome(self, head: ListNode) -> bool:
+            if head is None:
+                return True 
+            # 先通过「双指针技巧」中的快慢指针来找到链表的中点
+            slow = fast = head 
+            while fast is not None and fast.next is not None:
+                slow = slow.next  # 慢指针走一步
+                fast = fast.next.next  # 快指针走两步
+            if fast is not None:
+                # 如果fast指针没有指向null，说明链表长度为奇数，slow还要再前进一步
+                slow = slow.next 
+            # print(slow)
+            
+            # 从slow开始反转后面的链表，现在就可以开始比较回文串了
+            left = head 
+            right = self.reverse(slow)
+            #print(right)
+            while right is not None:
+                if left.val != right.val:
+                    return False 
+                left = left.next 
+                right = right.next 
+            
+            return True 
+    
+        def reverse(self, head: ListNode) -> ListNode:
+            """反转链表"""
+            pre, cur = None, head
+            while cur is not None:
+                # 指针移动
+                nxt = cur.next
+                cur.next = pre 
+                # 指针转向
+                pre = cur
+                cur = nxt   
+    
+            return pre      
+
+算法总体的时间复杂度 O(N)，空间复杂度 O(1)，已经是最优的了。
+
+我知道肯定有读者会问：这种解法虽然高效，但破坏了输入链表的原始结构，能不能避免这个瑕疵呢？
+
+其实这个问题很好解决，关键在于得到p, q这两个指针位置：
+
+![image](images/11.jpg)
+
+这样，只要在函数 return 之前加一段代码即可恢复原先链表顺序：
+
+    p.next = self.reverse(q)
