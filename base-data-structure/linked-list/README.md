@@ -418,7 +418,7 @@
         print(head.val);
     }
 
-模仿双指针实现回文判断的功能
+**模仿双指针实现回文判断的功能**
 
     # Definition for singly-linked list.
     # class ListNode:

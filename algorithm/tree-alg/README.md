@@ -229,3 +229,242 @@ linked：https://leetcode-cn.com/problems/flatten-binary-tree-to-linked-list
             return root
 
 ## 把题目的要求细化，搞清楚根节点应该做什么，然后剩下的事情抛给前/中/后序的遍历框架就行了，我们千万不要跳进递归的细节里，你的脑袋才能压几个栈呀。
+
+## LeetCode-124. 二叉树中的最大路径和
+
+路径被定义为一条从树中任意节点出发，沿父节点-子节点连接，达到任意节点的序列。同一个节点在一条路径序列中至多出现一次 。该路径 至少包含一个 节点，且不一定经过根节点。
+
+路径和 是路径中各节点值的总和。
+
+给你一个二叉树的根节点 root ，返回其 最大路径和 。
+
+示例 1：
+
+![image](images/2.jpg)
+
+    输入：root = [1,2,3]
+    输出：6
+    解释：最优路径是 2 -> 1 -> 3 ，路径和为 2 + 1 + 3 = 6
+
+示例 2:
+
+![image](images/3.jpg)
+
+    输入：root = [-10,9,20,null,null,15,7]
+    输出：42
+    解释：最优路径是 15 -> 20 -> 7 ，路径和为 15 + 20 + 7 = 42
+
+Linked：https://leetcode-cn.com/problems/binary-tree-maximum-path-sum
+
+**代码实现：递归，中序遍历，深度优先搜索**, 节点的最大贡献：**以该节点出发最大路径和**
+
+    # Definition for a binary tree node.
+    # class TreeNode:
+    #     def __init__(self, val=0, left=None, right=None):
+    #         self.val = val
+    #         self.left = left
+    #         self.right = right
+    class Solution:
+        max_path_sum = float("-inf")
+        def maxPathSum(self, root: TreeNode) -> int:
+            root_gain = self.maxGain(root)
+    
+            return self.max_path_sum
+    
+        def maxGain(self, root: TreeNode) -> int:
+            """递归计算每个节点的最大贡献 --- 后序遍历 --- dfs"""
+            if root is None:
+                # 节点为空, 那么贡献度为空
+                return 0 
+    
+            # 递归计算左右子节点的最大贡献值
+            # 只有在最大贡献值大于 0 时，才会选取对应子节点
+            left_gain = max(self.maxGain(root.left), 0)  # 当前节点左树的最大贡献
+            right_gain = max(self.maxGain(root.right), 0)  # 当前节点右树的最大贡献
+    
+            # 节点的最大路径和取决于该节点的值与该节点的左右子节点的最大贡献值
+            current_node_gain = root.val + left_gain + right_gain
+    
+            # 更新最大路径
+            self.max_path_sum = max(self.max_path_sum, current_node_gain)
+    
+            return root.val + max(left_gain, right_gain)  # 当前节点的最大贡献度
+
+## LeetCode-654. 最大二叉树
+
+给定一个不含重复元素的整数数组 nums 。一个以此数组直接递归构建的 最大二叉树 定义如下：
+
+二叉树的根是数组 nums 中的最大元素。
+
+    1. 左子树是通过数组中 最大值左边部分 递归构造出的最大二叉树。
+    2. 右子树是通过数组中 最大值右边部分 递归构造出的最大二叉树。
+    3. 返回有给定数组 nums 构建的 最大二叉树 。
+    
+示例 1：
+
+![image](images/4.jpg)
+
+    输入：nums = [3,2,1,6,0,5]
+    输出：[6,3,5,null,2,0,null,null,1]
+    解释：递归调用如下所示：
+    - [3,2,1,6,0,5] 中的最大值是 6 ，左边部分是 [3,2,1] ，右边部分是 [0,5] 。
+        - [3,2,1] 中的最大值是 3 ，左边部分是 [] ，右边部分是 [2,1] 。
+            - 空数组，无子节点。
+            - [2,1] 中的最大值是 2 ，左边部分是 [] ，右边部分是 [1] 。
+                - 空数组，无子节点。
+                - 只有一个元素，所以子节点是一个值为 1 的节点。
+        - [0,5] 中的最大值是 5 ，左边部分是 [0] ，右边部分是 [] 。
+            - 只有一个元素，所以子节点是一个值为 0 的节点。
+            - 空数组，无子节点。
+
+Linked：https://leetcode-cn.com/problems/maximum-binary-tree
+
+代码实现：
+
+    # Definition for a binary tree node.
+    # class TreeNode:
+    #     def __init__(self, val=0, left=None, right=None):
+    #         self.val = val
+    #         self.left = left
+    #         self.right = right
+    class Solution:
+        def constructMaximumBinaryTree(self, nums: List[int]) -> TreeNode:
+            """前序遍历, 先构造跟节点"""
+            if not nums: 
+                return None
+            # 数组最大值划分左右子树
+            max_value, max_index = float("-inf"), 0 
+            for idx, element in enumerate(nums):
+                if element > max_value:
+                    max_value = element
+                    max_index = idx 
+            
+            left_nums = nums[:max_index] 
+            right_nums = nums[max_index+1:]
+    
+            root = TreeNode(max_value)  # 构建当前根节点
+            root.left = self.constructMaximumBinaryTree(left_nums)  # 构建左树
+            root.right = self.constructMaximumBinaryTree(right_nums)  # 构建右树
+    
+            return root 
+
+## LeetCode-105. 从前序与中序遍历序列构造二叉树
+
+根据一棵树的前序遍历与中序遍历构造二叉树。
+
+**注意**:你可以假设树中没有重复的元素。
+
+例如，给出
+
+    前序遍历 preorder = [3,9,20,15,7]
+    中序遍历 inorder = [9,3,15,20,7]
+
+返回如下的二叉树：
+
+      3
+     / \
+    9  20
+      /  \
+     15   7
+
+Linked：https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal
+
+代码实现：
+
+    # Definition for a binary tree node.
+    # class TreeNode:
+    #     def __init__(self, val=0, left=None, right=None):
+    #         self.val = val
+    #         self.left = left
+    #         self.right = right
+    class Solution:
+        def buildTree(self, preorder: List[int], inorder: List[int]) -> TreeNode:
+            """根据前序, 中序重新构建树"""
+            return self.build(preorder, 0, len(preorder) - 1, 
+                              inorder, 0, len(inorder))
+    
+        def build(self, preorder: List[int], pre_start: int, pre_end: int, 
+                  inorder: List[int], in_start: int, in_end: int):
+            """递归构建树, 前序遍历
+                pre_start: 前序起点, pre_end：前序终点, 
+                in_start: 中序起点, in_end: 中序终点"""
+            if pre_start > pre_end:
+                # base case, 树元素访问完毕
+                return None 
+            
+            root_value = preorder[pre_start]  # 前序遍历第一个值为根节点值
+            # 确定根节点在中序遍历的位置, 中序遍历根节点将树分为左子树与右子树
+            inorder_root_index = 0 
+            for idx, value in enumerate(inorder):
+                if root_value == value:
+                    inorder_root_index = idx
+                    break 
+    
+            root = TreeNode(root_value)  
+            # 中序遍历的作用就是协助分离左右子树, 前序的作用就是确定根节点
+            left_size = inorder_root_index - in_start  # 左子树的大小
+            root.left = self.build(preorder, pre_start + 1, pre_start + left_size, 
+                                   inorder, in_start, inorder_root_index - 1)
+            root.right = self.build(preorder, pre_start + left_size + 1, pre_end, 
+                                    inorder, inorder_root_index + 1, in_end)
+            
+            return root 
+            
+## LeetCode-106. 从中序与后序遍历序列构造二叉树
+
+根据一棵树的中序遍历与后序遍历构造二叉树。
+
+**注意**:你可以假设树中没有重复的元素。
+
+例如，给出
+
+    中序遍历 inorder = [9,3,15,20,7]
+    后序遍历 postorder = [9,15,7,20,3]
+    
+返回如下的二叉树：
+
+      3
+     / \
+    9  20
+      /  \
+     15   7
+
+Linked：https://leetcode-cn.com/problems/construct-binary-tree-from-inorder-and-postorder-traversal
+
+代码实现：
+
+    # Definition for a binary tree node.
+    # class TreeNode:
+    #     def __init__(self, val=0, left=None, right=None):
+    #         self.val = val
+    #         self.left = left
+    #         self.right = right
+    class Solution:
+        def buildTree(self, inorder: List[int], postorder: List[int]) -> TreeNode:
+            return self.build(inorder, 0, len(inorder) - 1, 
+                              postorder, 0, len(postorder) - 1)
+    
+        def build(self, inorder: List[int], in_start: int, in_end: int, 
+                  postorder: List[int], post_start: int, post_end: int) -> TreeNode:
+            """中序遍历拆解左右子树, 后序遍历寻根"""
+            if post_start > post_end:
+                # base case, 节点子树为空
+                return None 
+    
+            root_value = postorder[post_end]
+            root_index = 0
+            for idx, value in enumerate(inorder):
+                if value == root_value:
+                    root_index = idx
+                    break 
+            
+            root = TreeNode(root_value)
+            left_size = root_index - in_start  # 左子树的节点数
+            # 递归调用建子树
+            root.left = self.build(inorder, in_start, root_index - 1, 
+                                   postorder, post_start, post_start + left_size - 1)
+            root.right = self.build(inorder, root_index + 1, in_end, 
+                                    postorder, post_start + left_size, post_end - 1)
+    
+            return root 
+    
