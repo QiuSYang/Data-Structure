@@ -145,4 +145,30 @@ Linked:https://leetcode-cn.com/problems/edit-distance/
 
         # 储存着整个 s1 和 s2 的最小编辑距离
         return dp[m][n]
+        
+## 1143. 最长公共子序列
+
+Linked：https://leetcode-cn.com/problems/longest-common-subsequence/
+        
+代码实现：
+
+    class Solution:
+        def longestCommonSubsequence(self, text1: str, text2: str) -> int:
+            m, n = len(text1), len(text2)
+            # base case 
+            dp = [[0]*(n+1) for _ in range(m+1)]
+    
+            for i in range(1, m+1):
+                for j in range(1, n+1):
+                    if text1[i-1] == text2[j-1]:
+                        # s1[i-1] 和 s2[j-1] 必然在 lcs 中, 上一次最大值+1
+                        dp[i][j] = 1 + dp[i-1][j-1]
+                    else:
+                        # s1[i-1] 和 s2[j-1] 至少有一个不在 lcs 中, 等于上一次最大值
+                        dp[i][j] = max(
+                            dp[i][j-1], 
+                            dp[i-1][j], 
+                        )
+            
+            return dp[m][n]
 
