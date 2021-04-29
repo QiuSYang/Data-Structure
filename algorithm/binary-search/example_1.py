@@ -51,10 +51,61 @@ def binary_search_recursion(arr: list, target):
     return index
 
 
+def fib(n):
+    if n == 0:
+        return 0
+    if n == 1:
+        return 1
+    # dp = [0] * (n+1)
+    #
+    # dp[1] = 1
+    pre, cur = 0, 1
+    for i in range(2, n+1):
+        # dp[i] = dp[i-1] + dp[i-2]
+        sum = pre + cur
+        pre = cur
+        cur = sum
+
+    return sum
+
+
+def str2int(text: str):
+    text = reversed(text)
+    sum = 0
+    for idx, char in enumerate(text):
+        temp = ord(char) - ord("0")
+        sum += 10**idx * temp
+
+    return sum
+
+
+def str2float(text: str):
+    text_list = text.split(".")
+    if len(text_list) < 2:
+        return str2int("".join(text_list))
+    int_arr, float_arr = text_list[0], text_list[1]
+
+    total = 0
+    for idx, char in enumerate(reversed(int_arr)):
+        temp = ord(char) - ord("0")
+        total += 10 ** idx * temp
+
+    for idx, char in enumerate(float_arr):
+        temp = ord(char) - ord("0")
+        x = idx + 1
+        total += 0.1**x * temp
+
+    return total
+
+
 if __name__ == '__main__':
     logging.basicConfig(format="[%(asctime)s %(filename)s:%(lineno)s] %(message)s",
                         level=logging.INFO,
                         filemode="a",
                         filename=None)
-    logger.info("二分查找结果：{}".format(binary_search([1, 2, 5, 7, 9, 10], 2)))
-    logger.info("二分查找结果(递归版)：{}".format(binary_search_recursion([1, 2, 5, 7, 9, 10], 2)))
+    # logger.info("二分查找结果：{}".format(binary_search([1, 2, 5, 7, 9, 10], 2)))
+    # logger.info("二分查找结果(递归版)：{}".format(binary_search_recursion([1, 2, 5, 7, 9, 10], 2)))
+    # for i in range(5):
+    #     logger.info(fib(i))
+
+    logger.info(str2float("12.999"))
