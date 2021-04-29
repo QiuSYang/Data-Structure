@@ -187,3 +187,68 @@ CPU资源是有限的，任务的处理速度与线程个数并不是线性正�
 
 除了前面讲到队列应用在线程池请求排队的场景之外，队列可以应用在任何有限资源池中，用于排队请求，比如数据库连接池等。实际上，对于大部分资源有限的场景，当没有空闲资源时，基本上都可以通过“队列”这种数据结构来实现请求排队。
 
+## LeetCode-695. 岛屿的最大面积
+
+Linked: https://leetcode-cn.com/problems/max-area-of-island/
+
+代码实现：
+
+    from queue import Queue
+    class Solution:
+        def maxAreaOfIsland(self, grid: List[List[int]]) -> int:
+            """使用队列实现, 广度优先搜索"""
+            if not grid:
+                return 0 
+            direct_coors = [(0, -1), (-1, 0), (0, 1), (1, 0)]  # 四个方位offset 
+    
+            max_area = 0 
+            q = Queue()
+            for i in range(len(grid)):
+                for j in range(len(grid[0])):
+                    area = 0 
+                    if grid[i][j] == 1:
+                        area += 1 
+                        grid[i][j] = 0  # 已经搜索过的位置置0 
+                        
+                        q.put((i, j))  # 入列
+                        while True:
+                            if q.empty():
+                                break 
+                            cur = q.get()  # 元素出列
+                            for offset in direct_coors:
+                                # 四个方向广度优先搜索
+                                row, col = cur[0] + offset[0], cur[1] + offset[1]
+                                if (row < 0 or row >= len(grid)
+                                    or col <0 or col >= len(grid[0])
+                                    or grid[row][col] == 0):
+                                    continue
+                                q.put((row, col))
+                                area += 1 
+                                grid[row][col] = 0 
+                    max_area = max(max_area, area)  # 求最大岛屿
+    
+            return max_area
+        
+        def maxAreaOfIsland_dfs(self, grid: List[List[int]]) -> int:
+            """深度优先搜索"""
+            if not grid:
+                return 0 
+            max_area = 0 
+            for i in range(len(grid)):
+                for j in range(len(grid[0])):
+                    max_area = max(max_area, self.dfs(grid, i, j))
+    
+            return max_area
+        
+        def dfs(self, grid, row, col):
+            """四个方向深度搜索---dfs"""
+            if (row<0 or row>=len(grid) or 
+                col<0 or col>=len(grid[0]) or 
+                grid[row][col] == 0):
+                return 0 
+            grid[row][col] = 0  # 当前位置已经被访问, 置0
+    
+            # 返回当前位置面积1+四个近邻位置的面积
+            return (1 + self.dfs(grid, row, col-1) + self.dfs(grid, row-1, col) 
+                    + self.dfs(grid, row, col+1) + self.dfs(grid, row+1, col))
+
