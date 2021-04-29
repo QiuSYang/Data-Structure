@@ -37,11 +37,41 @@ def numIslands(grid: List[List[str]]) -> int:
     return index - 1
 
 
+def numIslands_dfs(grid: List[List[str]]) -> int:
+    """深度优先搜索---dfs"""
+    if not grid:
+        return 0
+    index = 1
+    for i in range(len(grid)):
+        for j in range(len(grid[0])):
+            if grid[i][j] == "1":
+                index += 1
+                dfs(grid, i, j, index)
+
+    return index - 1
+
+
+def dfs(grid, row, col, index):
+    """四个方向深度搜索---dfs"""
+    if (row < 0 or row >= len(grid) or
+            col < 0 or col >= len(grid[0]) or
+            grid[row][col] != "1"):
+        return
+
+    grid[row][col] = str(index)  # 当前位置已经被访问, 置index
+
+    # 四个方向DFS
+    dfs(grid, row, col - 1, index)
+    dfs(grid, row - 1, col, index)
+    dfs(grid, row, col + 1, index)
+    dfs(grid, row + 1, col, index)
+
+
 if __name__ == '__main__':
     arr = [["1","1","0","0","0"],
            ["1","1","0","0","0"],
            ["0","0","1","0","0"],
            ["0","0","0","1","1"]]
 
-    result = numIslands(arr)
+    result = numIslands_dfs(arr)
     print(result)
