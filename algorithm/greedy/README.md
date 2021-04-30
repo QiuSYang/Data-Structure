@@ -115,3 +115,94 @@
 实际上，贪心算法适用的场景比较有限。这种算法思想更多的是指导设计基础算法。比如**最小生成树算法、单源最短路径算法，这些算法都用到了贪心算法**。从我个人的学习经验来讲，不要刻意去记忆贪心算法的原理，多练习才是最有效的学习方法。
 
 贪心算法的最难的一块是**如何将要解决的问题抽象成贪心算法模型**，只要这一步搞定之后，贪心算法的编码一般都很简单。贪心算法解决问题的正确性虽然很多时候都看起来是显而易见的，但是要严谨地证明算法能够得到最优解，并不是件容易的事。所以，很多时候，我们只需要多举几个例子，看一下贪心算法的解决方案是否真的能得到最优解就可以了。
+
+## LeetCode-402. 移掉K位数字
+
+Linked: https://leetcode-cn.com/problems/remove-k-digits/
+
+代码实现：
+
+    class Solution:
+        def removeKdigits(self, num: str, k: int) -> str:
+            """贪心算法"""
+            save_nums = []
+            # 构造单调递增序列
+            for c in num:
+                while k > 0 and save_nums and save_nums[-1] > c:
+                    # 依次删除K个字符, 删除条件---当前元素大于栈顶元素
+                    save_nums.pop()  # 栈顶元素出列
+                    k -= 1 
+                save_nums.append(c)  # 元素入栈
+    
+            # 还没有移除K个元素, save_nums已经满足单调递增序列
+            results = save_nums[:-k] if k > 0 else save_nums 
+    
+            # 去除数字左边的0 
+            return "".join(results).lstrip('0') or "0"
+            
+## LeetCode-42. 接雨水
+
+Linked: https://leetcode-cn.com/problems/trapping-rain-water/
+
+代码实现: 
+
+    class Solution:
+        def trap_(self, height: List[int]) -> int:
+            """暴力搜索"""
+            if not height:
+                return 0 
+            result = 0 
+            nums = len(height)
+            for i in range(nums):
+                l_max, r_max = 0, 0  # 当前位置左右两侧最值高度
+                for left in range(i,-1,-1):
+                    # 当前id左侧最大板
+                    l_max = max(l_max, height[left])
+                for right in range(i, nums, 1):
+                    # 当前id右侧侧最大板
+                    r_max = max(r_max, height[right])
+    
+                result = result + (min(l_max, r_max) - height[i])   # 减去当前高度
+    
+            return result 
+        
+        def trap__(self, height: List[int]) -> int:
+            """备忘录法"""
+            if not height:
+                return 0 
+            result = 0 
+            nums = len(height)
+            l_max, r_max = [0]*nums, [0]*nums
+            l_max[0], r_max[nums-1] = height[0], height[nums-1]  # 
+            for i in range(1, nums):
+                # 从左向右计算每个位置l_max
+                l_max[i] = max(height[i], l_max[i-1])  # 如果当前位置最大, 说明这个位置没有容量
+            for i in range(nums-2, -1, -1):
+                # 从右向左计算 r_max
+                r_max[i] = max(height[i], r_max[i+1])
+            
+            result = 0 
+            for i in range(nums):
+                result = result + (min(l_max[i], r_max[i]) - height[i])  # 与最短板的高度差
+    
+            return result 
+    
+        def trap(self, height: List[int]) -> int:
+            """双指针法"""
+            if not height:
+                return 0 
+            result = 0 
+            left, right = 0, len(height)-1
+            l_max, r_max = 0, 0 
+            while left <= right:
+                l_max = max(l_max, height[left])  # 获取当前位置左边最大高度
+                r_max = max(r_max, height[right])  # 获取当前位置右边最大高度
+    
+                if l_max < r_max:
+                    result = result + l_max - height[left]
+                    left += 1  # 左侧移动
+                else:
+                    result = result + r_max - height[right]
+                    right -= 1  # 右侧移动
+            
+            return result 
