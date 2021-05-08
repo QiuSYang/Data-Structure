@@ -144,3 +144,44 @@ Linked: https://leetcode-cn.com/problems/n-queens/
                 j -= 1 
             
             return True
+            
+## LeetCode-111. 二叉树的最小深度
+
+Linked: https://leetcode-cn.com/problems/minimum-depth-of-binary-tree/
+
+代码实现: 
+
+    # Definition for a binary tree node.
+    # class TreeNode:
+    #     def __init__(self, val=0, left=None, right=None):
+    #         self.val = val
+    #         self.left = left
+    #         self.right = right
+    class Solution:
+        def minDepth(self, root: TreeNode) -> int:
+            """广度优先搜索"""
+            if root is None:
+                return 0
+            depth = 1  # root 本来就是一层
+    
+            queue = []  # 头部插入数据，尾部取数据()
+            queue.append(root)
+            while queue:
+                size = len(queue)
+                for i in range(size):
+                    # 依次访问当前层所有节点
+                    current_node = queue.pop()
+                    if current_node.left is None and current_node.right is None:
+                        return depth
+                    if current_node.left is not None:
+                        queue.insert(0, current_node.left)
+                    if current_node.right is not None:
+                        queue.insert(0, current_node.right)
+                
+                depth += 1  # 单层访问完深度+1
+            
+            return depth
+
+## LeetCode-752. 打开转盘锁 
+
+Linked: https://leetcode-cn.com/problems/open-the-lock/
