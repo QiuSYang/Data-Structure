@@ -144,6 +144,41 @@ Linked: https://leetcode-cn.com/problems/n-queens/
                 j -= 1 
             
             return True
+
+# BFS --- 广度优先搜索
+
+## 框架
+
+    // 计算从起点 start 到终点 target 的最近距离
+    int BFS(Node start, Node target) {
+        Queue<Node> q; // 核心数据结构
+        Set<Node> visited; // 避免走回头路
+        
+        q.offer(start); // 将起点加入队列
+        visited.add(start);
+        int step = 0; // 记录扩散的步数
+    
+        while (q not empty) {
+            int sz = q.size();
+            /* 将当前队列中的所有节点向四周扩散 */
+            for (int i = 0; i < sz; i++) {
+                Node cur = q.poll();
+                /* 划重点：这里判断是否到达终点 */
+                if (cur is target)
+                    return step;
+                /* 将 cur 的相邻节点加入队列 */
+                for (Node x : cur.adj())
+                    if (x not in visited) {
+                        q.offer(x);
+                        visited.add(x);
+                    }
+            }
+            /* 划重点：更新步数在这里 */
+            step++;
+        }
+    }
+
+队列 q 就不说了，BFS 的核心数据结构；cur.adj() 泛指 cur 相邻的节点，比如说二维数组中，cur 上下左右四面的位置就是相邻节点；visited 的主要作用是防止走回头路，大部分时候都是必须的，但是像一般的二叉树结构，没有子节点到父节点的指针，不会走回头路就不需要 visited。
             
 ## LeetCode-111. 二叉树的最小深度
 
@@ -185,3 +220,66 @@ Linked: https://leetcode-cn.com/problems/minimum-depth-of-binary-tree/
 ## LeetCode-752. 打开转盘锁 
 
 Linked: https://leetcode-cn.com/problems/open-the-lock/
+
+代码实现:
+    
+    class Solution:
+        def openLock(self, deadends: List[str], target: str) -> int:
+            """BFS"""
+            visited = []  # 记录已经穷举过的密码，防止走回头路
+            queue = [] 
+            step = 0 
+            # 从起点开始启动广度优先搜索
+            queue.append("0000")
+            visited.append("0000")
+            while queue:
+                size = len(queue)
+                for i in range(size):
+                    cur = queue.pop()  # 获取队头元素
+    
+                    # 判断是否到达终点
+                    if cur in deadends:
+                        continue 
+                    if cur == target:
+                        return step 
+    
+                    # 将一个节点的未遍历相邻节点加入队列
+                    for j in range(4):
+                        # 四个位置依次操作一遍
+                        up = self.plus_one(cur, j)
+                        if up not in visited:
+                            queue.insert(0, up)
+                            visited.append(up)
+                        
+                        down = self.minus_one(cur, j)
+                        if down not in visited:
+                            queue.insert(0, down)
+                            visited.append(up)
+                step += 1 
+    
+            return -1 
+    
+        def plus_one(self, s: str, j: int):
+            """s[j], 向上拨动一次"""
+            nums = list(s)
+            if nums[j] == '9':
+                nums[j] = '0'
+            else:
+                nums[j] = str(int(nums[j]) + 1)
+            
+            s = "".join(nums) 
+            
+            return s 
+        
+        def minus_one(self, s: str, j: int):
+            """s[j], 向下拨动一次"""
+            nums = list(s)
+            if nums[j] == '0':
+                nums[j] = '9'
+            else:
+                nums[j] = str(int(nums[j]) - 1)
+            
+            s = "".join(nums) 
+            
+            return s 
+     
