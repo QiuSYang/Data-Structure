@@ -381,7 +381,7 @@ Linked：https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-an
         def buildTree(self, preorder: List[int], inorder: List[int]) -> TreeNode:
             """根据前序, 中序重新构建树"""
             return self.build(preorder, 0, len(preorder) - 1, 
-                              inorder, 0, len(inorder))
+                              inorder, 0, len(inorder) - 1)
     
         def build(self, preorder: List[int], pre_start: int, pre_end: int, 
                   inorder: List[int], in_start: int, in_end: int):
@@ -467,4 +467,46 @@ Linked：https://leetcode-cn.com/problems/construct-binary-tree-from-inorder-and
                                     postorder, post_start + left_size, post_end - 1)
     
             return root 
+
+## LeetCode-652. 寻找重复的子树
+
+Linked: https://leetcode-cn.com/problems/find-duplicate-subtrees/submissions/
+
+代码实现:
+
+    # Definition for a binary tree node.
+    # class TreeNode:
+    #     def __init__(self, val=0, left=None, right=None):
+    #         self.val = val
+    #         self.left = left
+    #         self.right = right
+    class Solution:
+        def findDuplicateSubtrees(self, root: TreeNode) -> List[TreeNode]:
+            result = []
+            sub_tree = {}
+            def traverse(root: TreeNode) -> str:
+                """后续遍历"""
+                if root is None:
+                    return "#"
+                
+                # 树序列化
+                left_str = traverse(root.left)
+                right_str = traverse(root.right)
+                sub_tree_str = left_str + "->" + right_str + "->" + str(root.val)  
+                # print(sub_tree_str)
+                # 序列化子树作为可以
+                if sub_tree_str not in sub_tree:
+                    sub_tree[sub_tree_str] = 0 
+                else:
+                    sub_tree[sub_tree_str] += 1 
+                
+                if sub_tree[sub_tree_str] == 1:
+                    # 重复子树加入结果列表
+                    result.append(root)
+                
+                return sub_tree_str
+            
+            traverse(root)
+    
+            return result
     
