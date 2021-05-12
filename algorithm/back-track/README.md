@@ -282,4 +282,31 @@ Linked: https://leetcode-cn.com/problems/open-the-lock/
             s = "".join(nums) 
             
             return s 
-     
+
+## LeetCode-22. 括号生成
+
+Linked: https://leetcode-cn.com/problems/generate-parentheses/
+
+代码实现: 
+
+    class Solution:
+        def generateParenthesis(self, n: int) -> List[str]:
+            result = []
+            def backtrack(single: list, left: int, right: int):
+                """回溯算法---dfs"""
+                if len(single) == 2 * n:
+                    # 验证其合法性
+                    result.append("".join(single))
+                    return 
+                if left < n:
+                    single.append('(')  # 选择
+                    backtrack(single, left+1, right)  # 递归
+                    single.pop() # 撤销选择
+                if right < left:
+                    single.append(')')
+                    backtrack(single, left, right+1)  # 递归
+                    single.pop() 
+            
+            backtrack([], 0, 0)
+    
+            return result 
