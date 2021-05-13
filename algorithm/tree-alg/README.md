@@ -483,7 +483,7 @@ Linked: https://leetcode-cn.com/problems/find-duplicate-subtrees/submissions/
     class Solution:
         def findDuplicateSubtrees(self, root: TreeNode) -> List[TreeNode]:
             result = []
-            sub_tree = {}
+            sub_tree = {}  # 哈希存储子树是否出现过
             def traverse(root: TreeNode) -> str:
                 """后续遍历"""
                 if root is None:
