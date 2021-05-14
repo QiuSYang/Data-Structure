@@ -69,3 +69,49 @@ Linked: https://leetcode-cn.com/problems/add-two-numbers/
     
             return result.next
 
+## LeetCode-3. 无重复字符的最长子串
+
+Linked: https://leetcode-cn.com/problems/longest-substring-without-repeating-characters/
+
+代码实现:
+
+    class Solution:
+        def lengthOfLongestSubstring_(self, s: str) -> int:
+            result = []
+            max_value = -1
+            for c in s:
+                if c not in result:
+                    # 没有重复的字符加入列表
+                    result.append(c)
+                else:
+                    max_value = max(max_value, len(result))  # 获取当前最大子串
+                    index = result.index(c)  # 获取子串当前元素的索引位置
+                    result = result[index+1:]  # 去除索引之前的元素
+                    result.append(c)  # 将新的元素插入列表
+            max_value = max(max_value, len(result))
+    
+            return max_value
+    
+        def lengthOfLongestSubstring(self, s: str) -> int:
+            """动态规划
+            状态转移方程: 给出一个字符串Si，已知它的最长子串长度为Li，如果在Si的末尾追加一个字符C，
+            即Si+1=Si+C，那么Si+1的最长子串是多少？
+            即lengthOfLongestSubString(Si+1)=max(Li,len(C结尾的无重复子串))
+            """
+            def find_left(s):
+                tmp_str = s[-1]
+                j = len(s) - 2
+                while j >= 0 and s[j] not in tmp_str:
+                    tmp_str += s[j]
+                    j -= 1
+                return tmp_str 
+    
+            length = len(s) 
+            dp = [0] * (length + 1)
+            for i in range(1, length+1):
+                sub_s = s[:i]
+                # 以s[i-1]字符结尾的无重复子串
+                max_c_end_sub_str = find_left(sub_s)
+                dp[i] = max(dp[i-1], len(max_c_end_sub_str))
+            
+            return dp[length]
