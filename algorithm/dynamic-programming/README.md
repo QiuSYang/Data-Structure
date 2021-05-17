@@ -64,6 +64,8 @@ Linked：https://leetcode-cn.com/problems/coin-change
     
     class Solution:
     def coinChange(self, coins: List[int], amount: int) -> int:
+        """状态: dp[i], 钱数为i需要最少的币数
+           转移方程: dp[i] = min(dp[i], 1+dp[i - coin]), 即当前钱所需的面值钱数=1+凑够(1 - coin)所需的钱数"""
         dp = [amount + 1] * (amount + 1)  # 最小面值为1, 最大次数不会超过amount 
         # base case 
         dp[0] = 0  # 面值为0, 不需要凑钱
@@ -119,6 +121,7 @@ Linked:https://leetcode-cn.com/problems/edit-distance/
 
     class Solution:
     def minDistance(self, word1: str, word2: str) -> int:
+        """状态f[i][j], word1前i个字符与word2前j个字符的编辑距离"""
         m, n = len(word1), len(word2)
         # base case 
         dp = [[0]*(n+1) for _ in range(m+1)]
@@ -154,21 +157,110 @@ Linked：https://leetcode-cn.com/problems/longest-common-subsequence/
 
     class Solution:
         def longestCommonSubsequence(self, text1: str, text2: str) -> int:
-            m, n = len(text1), len(text2)
-            # base case 
-            dp = [[0]*(n+1) for _ in range(m+1)]
+            """动态规划, LCS---最长公共子序列
+            状态: f[i][j]代表, text1前i个字符与text2前j个字符的最大公共子序列
+            状态转移方程：
+            1. text1[i]==text2[j], 第i个字符与第j个字符相同，dp[i][j] = dp[i-1][j-1] + 1, 
+            2. text1[i]==text2[j], 第i个字符与第j个字符不相同, dp[i][j] = max(dp[i][j-1], dp[i-1][j]),
+            即text1前i个字符与text2前j-1一个字符的最大公共子序列，
+            或者text1前i-1个字符与text2前j一个字符的最大公共子序列，取两者的最大值"""
+            n, m = len(text1), len(text2)
+            dp = [[0]*(m+1) for _ in range(n+1)]
     
-            for i in range(1, m+1):
-                for j in range(1, n+1):
+            for i in range(1, n+1):
+                for j in range(1, m+1):
                     if text1[i-1] == text2[j-1]:
-                        # s1[i-1] 和 s2[j-1] 必然在 lcs 中, 上一次最大值+1
-                        dp[i][j] = 1 + dp[i-1][j-1]
+                        # text1第i个字符与text2第j个字符相等
+                        dp[i][j] = dp[i-1][j-1] + 1 
                     else:
-                        # s1[i-1] 和 s2[j-1] 至少有一个不在 lcs 中, 等于上一次最大值
-                        dp[i][j] = max(
-                            dp[i][j-1], 
-                            dp[i-1][j], 
-                        )
-            
-            return dp[m][n]
+                        # s1[i] 和 s2[j] 中至少有一个字符不在 lcs 中
+                        dp[i][j] = max(dp[i][j-1], dp[i-1][j])
+    
+            return dp[n][m]
 
+## LeetCode-516. 最长回文子序列
+
+Linked: https://leetcode-cn.com/problems/longest-palindromic-subsequence/
+
+代码实现:
+
+    class Solution:
+        def longestPalindromeSubseq(self, s: str) -> int:
+            """动态规划
+            状态: f[i][j], 代表s 的第 i 个字符到第 j 个字符组成的子串中，最长的回文序列长度是多少
+            转移方程：i从字符后向前移动，j从前向后移动, 从i节点向两边移动
+            1. s[i] == s[j], f[i][j] = f[i+1][j-1] + 2
+            2. s[i] != s[j], f[i][j] = max(f[i+1][j], f[i][j-1]), 
+            即退回到上一步，等于j到i+1子串与j-1到i的最大值"""
+            n = len(s)
+            dp = [[0]*(n+1) for _ in range(n+1)]  # dp[n][0] base case 
+            for i in range(n-1, -1, -1):
+                dp[i][i] = 1  # 中间位置字符就是一个回文字符
+                for j in range(i+1, n):
+                    # 状态转移方程
+                    if s[i] == s[j]:
+                        dp[i][j] = dp[i+1][j-1] + 2  # 等于前一次最大回文子串
+                    else:
+                        dp[i][j] = max(dp[i+1][j], dp[i][j-1])  
+            
+            return dp[0][n-1]
+
+## LeetCode-583. 两个字符串的删除操作
+
+Linked: https://leetcode-cn.com/problems/delete-operation-for-two-strings/
+
+代码实现: 
+
+    class Solution:
+        def minDistance(self, word1: str, word2: str) -> int:
+            """动态规划"""
+            def longestCommonSubsequence(word1: str, word2: str) -> int:
+                """求解两个字符串的最大公共子序列
+                状态: dp[i][j], 代表word1前i个字符与word2前j字符的最大公共子序列
+                转移方程: dp[i][j] = | 1 + dp[i-1][j-1], word1[i] = word2[j]
+                                    |max(d[i][j-1], d[i-1][j]), word1[i] != word2[j]"""
+                n, m = len(word1), len(word2)
+                dp = [[0]*(m+1) for _ in range(n+1)]
+                for i in range(1, n+1):
+                    for j in range(1, m+1):
+                        if word1[i-1] == word2[j-1]:
+                            dp[i][j] = dp[i-1][j-1] + 1 
+                        else:
+                            dp[i][j] = max(dp[i][j-1], dp[i-1][j])
+    
+                return dp[n][m]
+    
+            common_length = longestCommonSubsequence(word1, word2)
+            
+            # 减去公共部分不需要删除的，其他的就是需要删除的
+            return len(word1) - common_length + len(word2) - common_length
+
+## LeetCode-712. 两个字符串的最小ASCII删除和
+        
+Linked: https://leetcode-cn.com/problems/minimum-ascii-delete-sum-for-two-strings/
+
+代码实现:
+
+    class Solution:
+        def minimumDeleteSum(self, s1: str, s2: str) -> int:
+            """转换为求解最大公共子序列的最大ascall值和, min_delete = sum_value - max_common_sub_value
+            状态: d[i][j], 代表s1前i个字符与s2前j个字符的最大公共子序列最大ascall值之和
+            转移方程:d[i][j] = | d[i-1]d[j-1] + ord(c),  s[i] = s[j]
+                              | max(d[i][j-1], d[i-1]d[j]), s[i] != s[j]"""
+            sum_value = 0
+            for c in s1:
+                sum_value += ord(c)
+            for c in s2:
+                sum_value += ord(c)
+    
+            n, m = len(s1), len(s2)
+            dp = [[0]*(m+1) for _ in range(n+1)]  # base case dp[0][0] = 0 
+            for i in range(1, n+1):
+                for j in range(1, m+1):
+                    if s1[i-1] == s2[j-1]:
+                        dp[i][j] = dp[i-1][j-1] + ord(s1[i-1])
+                    else:
+                        dp[i][j] = max(dp[i][j-1], dp[i-1][j])
+            
+            return sum_value - 2*dp[n][m]  # dp[n][m] --- 主要取决于base case的位置
+             
