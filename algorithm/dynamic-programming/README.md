@@ -199,11 +199,27 @@ Linked: https://leetcode-cn.com/problems/longest-palindromic-subsequence/
                 for j in range(i+1, n):
                     # 状态转移方程
                     if s[i] == s[j]:
-                        dp[i][j] = dp[i+1][j-1] + 2  # 等于前一次最大回文子串
+                        dp[i][j] = dp[i+1][j-1] + 2  # 等于前一次最大回文子序列
                     else:
                         dp[i][j] = max(dp[i+1][j], dp[i][j-1])  
             
             return dp[0][n-1]
+
+        def longestPalindromeSubseq(self, s: str) -> int:
+            """动态规划
+            将字符串s反转，转化为求解两字字符串的最长公共子序列"""
+            s_r = s[::-1]
+            n, m = len(s), len(s_r)
+    
+            dp = [[0]*(m+1) for _ in range(n+1)]
+            for i in range(1, n+1):
+                for j in range(1, m+1):
+                    if s[i-1] == s_r[j-1]:
+                        dp[i][j] = dp[i-1][j-1] + 1
+                    else:
+                        dp[i][j] = max(dp[i][j-1], dp[i-1][j])
+            
+            return dp[n][m]
 
 ## LeetCode-583. 两个字符串的删除操作
 
@@ -263,4 +279,106 @@ Linked: https://leetcode-cn.com/problems/minimum-ascii-delete-sum-for-two-string
                         dp[i][j] = max(dp[i][j-1], dp[i-1][j])
             
             return sum_value - 2*dp[n][m]  # dp[n][m] --- 主要取决于base case的位置
-             
+
+## LeetCode-718. 最长重复子数组
+
+Linked: https://leetcode-cn.com/problems/maximum-length-of-repeated-subarray/
+
+代码实现: 
+    
+    class Solution:
+        def findLength(self, nums1: List[int], nums2: List[int]) -> int:
+            """动态规划
+            状态: dp[i][j], 代表以nums1[i]结尾的最长重复子数组
+            转移方程: dp[i][j] = dp[i-1][j-1] + 1, nums1[i] == nums2[j]"""
+            n, m = len(nums1), len(nums2)
+    
+            dp = [[0]*(m+1) for _ in range(n+1)]
+            max_value = -1 
+            for i in range(1, n+1):
+                for j in range(1, m+1):
+                    if nums1[i-1] == nums2[j-1]:
+                        dp[i][j] = dp[i-1][j-1] + 1 
+                    max_value = max(max_value, dp[i][j])
+            
+            return max_value
+
+## LeetCode-5. 最长回文子串 
+
+Linked: https://leetcode-cn.com/problems/longest-palindromic-substring/
+
+代码实现: 
+
+    class Solution:
+        """测试用例："aacabdkacaa" 无法过"""
+        def longestPalindrome(self, s: str) -> str:
+            """动态规划, 将S字符串反转, 转化为求解最长子串
+            状态: dp[i][j], 代表以s[i]字符结尾的最长子串
+            转移方程: dp[i][j] = dp[i-1][j-1] + 1"""
+            sr = s[::-1]
+            n, m = len(s), len(sr)
+            dp = [[0]*(m+1) for _ in range(n+1)]
+    
+            max_value = 0  # 最大公共子串长度
+            end_index = 0
+            for i in range(1, n+1):
+                for j in range(1, m+1):
+                    if s[i-1] == sr[j-1]:
+                        dp[i][j] = dp[i-1][j-1] + 1 
+                    if dp[i][j] > max_value:
+                        max_value = dp[i][j]
+                        end_index = i  # 以 i 位置结尾的字符
+    
+            sub_str = s[end_index-max_value:end_index]    
+    
+            return sub_str
+
+## LeetCode-300. 最长递增子序列
+
+Linked: https://leetcode-cn.com/problems/longest-increasing-subsequence/
+
+代码实现: 
+
+    class Solution:
+        def lengthOfLIS(self, nums: List[int]) -> int:
+            """动态规划
+            状态: dp[i], 代表考虑前 i 个元素，以第 i 个数字结尾的最长上升子序列的长度
+            转移方程: dp[i] = max(dp[i], dp[0...i-1]+1), nums[i] > nums[0...i-1], 
+            即dp[i]依次与0..i-1 dp + 1比较取最大值, 即以num[0...i-1]结尾最大上升子序列长度+1"""
+            n = len(nums)
+            dp = [1]*(n)
+            max_length = dp[0]
+            for i in range(1, n):
+                for j in range(i):
+                    if nums[i] > nums[j]:
+                        dp[i] = max(dp[i], dp[j] + 1)
+                
+                max_length = max(max_length, dp[i])  # 对比每个位置最大值
+            
+            return max_length
+
+## LeetCode-64. 最小路径和
+
+Linked: https://leetcode-cn.com/problems/minimum-path-sum/
+
+代码实现:
+
+    class Solution:
+        def minPathSum(self, grid: List[List[int]]) -> int:
+            """动态规划
+            状态: dp[i][j], 代表从(0, 0)位置到(i, j)位置的最小路径和
+            转移方程：dp[i][j] = | grid[i][j], i==0 and j == 0 
+                                | min(dp[i-1][j], dp[i][j-1]) + grid[i][j], 
+                                即左边和上边的最小路径和+当前坐标值"""
+            n, m = len(grid), len(grid[0])
+            dp = [[float("inf")]*(m+1) for _ in range(n+1)]
+    
+            for i in range(1, n+1):
+                for j in range(1, m+1):
+                    if i == 1 and j == 1:
+                        dp[i][j] = grid[i-1][j-1]  # base case 
+                    else:
+                        # 状态转移方程, 当前坐标的最小值 = 正上与左边的最小值 + 当前坐标值
+                        dp[i][j] = min(dp[i-1][j], dp[i][j-1]) + grid[i-1][j-1]
+            
+            return dp[n][m]

@@ -370,3 +370,192 @@ Linked: https://leetcode-cn.com/problems/median-of-two-sorted-arrays/
             else:
                 # 偶数
                 return (getKthElement(totalLength // 2) + getKthElement(totalLength // 2 + 1)) / 2
+
+## LeetCode-5. 最长回文子串 
+
+Linked: https://leetcode-cn.com/problems/longest-palindromic-substring/
+
+代码实现: 
+
+    class Solution:
+        """测试用例："aacabdkacaa" 无法过"""
+        def longestPalindrome(self, s: str) -> str:
+            """动态规划, 将S字符串反转, 转化为求解最长子串
+            状态: dp[i][j], 代表以s[i]字符结尾的最长子串
+            转移方程: dp[i][j] = dp[i-1][j-1] + 1"""
+            sr = s[::-1]
+            n, m = len(s), len(sr)
+            dp = [[0]*(m+1) for _ in range(n+1)]
+    
+            max_value = 0  # 最大公共子串长度
+            end_index = 0
+            for i in range(1, n+1):
+                for j in range(1, m+1):
+                    if s[i-1] == sr[j-1]:
+                        dp[i][j] = dp[i-1][j-1] + 1 
+                    if dp[i][j] > max_value:
+                        max_value = dp[i][j]
+                        end_index = i  # 以 i 位置结尾的字符
+    
+            sub_str = s[end_index-max_value:end_index]    
+    
+            return sub_str
+
+## LeetCode-剑指 Offer 47. 礼物的最大价值
+
+Linked: https://leetcode-cn.com/problems/li-wu-de-zui-da-jie-zhi-lcof/
+
+代码实现: 
+
+    class Solution:
+        def maxValue(self, grid: List[List[int]]) -> int:
+            """动态规划
+            状态: dp[i][j], 代表从(0,0)坐标到(i,j)坐标的最大路径和
+            转移方程: dp[i][j] = max(dp[i-1][j], dp[i][j-1]) + grid[i][j], 
+            即左边最大路径与上方最大路径的最大值 + 当前坐标值"""
+            n, m = len(grid), len(grid[0])
+    
+            dp = [[0]*(m+1) for _ in range(n+1)]  # base case 价值大于0 
+            for i in range(1, n+1):
+                for j in range(1, m+1):
+                    dp[i][j] = max(dp[i-1][j], dp[i][j-1]) + grid[i-1][j-1] 
+            
+            return dp[n][m]
+
+## LeetCode-剑指 Offer 63. 股票的最大利润
+
+Linked: https://leetcode-cn.com/problems/gu-piao-de-zui-da-li-run-lcof/
+
+代码实现:
+
+    class Solution:
+        def maxProfit_dp(self, prices: List[int]) -> int:
+            """动态规划, 类似于求解最长上升子序列
+            状态: dp[i], 代表在i时刻可以获取的最大利润
+            转移方程: dp[i] = max(prices[i]-min_prices, dp[i-1]), 
+            即以prices[i]价格卖出, 当前可获取的价值与i-1时可获取的最大价值的最大值"""
+            if not prices:
+                return 0 
+            n = len(prices)
+            dp = [0] * (n+1)  # base case dp[0] = 0 
+    
+            min_i_value = prices[0] 
+            for i in range(1, n):
+                dp[i] = max(prices[i] - min_i_value, dp[i-1])
+                min_i_value = min(min_i_value, prices[i])  # 求解以prices[i]结尾子串的最小值
+            
+            return dp[n-1]
+        
+        def maxProfit(self, prices: List[int]) -> int:
+            """暴力遍历法"""
+            if not prices:
+                return 0 
+            n = len(prices)
+            max_value = 0
+            pre_min_prices = prices[0]  # 当前点之前的最小值
+            for i in range(n):
+                # 当前点卖出的最大利润
+                max_value = max(max_value, prices[i] - pre_min_prices)
+                pre_min_prices = min(pre_min_prices, prices[i])
+    
+            return max_value
+
+## LeetCode-6. Z 字形变换
+
+Linked: https://leetcode-cn.com/problems/zigzag-conversion/
+
+代码实现: 
+
+    class Solution:
+        def convert(self, s: str, numRows: int) -> str:
+            """按列遍历，指针上下波动"""
+            if numRows < 2:
+                return s 
+            
+            results = ["" for _ in range(numRows)]  # 记录每一行的字符
+            i = 0 
+            flage = -1  # 初始设置为向上
+            for c in s:
+                if i == 0 or i == numRows - 1:
+                    flage = -flage  # 调转方向 
+                results[i] += str(c)
+                i += flage 
+            
+            return "".join(results)
+
+## LeetCode-7. 整数反转
+
+Linked: https://leetcode-cn.com/problems/reverse-integer/
+
+代码实现:
+
+    class Solution:
+        def reverse(self, x: int) -> int:
+            """数学"""
+            INT_MIN, INT_MAX = -2**31, 2**31 - 1
+    
+            rev = 0
+            while x != 0:
+                # INT_MIN 也是一个负数，不能写成 rev < INT_MIN // 10
+                # -2147483648 // 10 = -214748365 可以发现向下多-1
+                if rev < INT_MIN//10 + 1 or rev > INT_MAX // 10:
+                    # 数组越界, 倒数第二次
+                    return 0  
+                digit = x % 10
+                # Python3 的取模运算在 x 为负数时也会返回 [0, 9) 以内的结果，因此这里需要进行特殊判断
+                if x < 0 and digit > 0:
+                    digit -= 10
+                # 同理，Python3 的整数除法在 x 为负数时会向下（更小的负数）取整，因此不能写成 x //= 10
+                x = (x - digit) // 10 
+    
+                rev = rev*10 + digit 
+            
+            return rev 
+
+## LeetCode-8. 字符串转换整数 (atoi)
+
+Linked: https://leetcode-cn.com/problems/string-to-integer-atoi/
+
+代码实现:
+
+    class Automaton:
+        """自动机"""
+        INT_MAX = 2 ** 31 - 1
+        INT_MIN = -2 ** 31
+        def __init__(self):
+            self.state = 'start'
+            self.sign = 1
+            self.ans = 0
+            self.table = {
+                'start': ['start', 'signed', 'in_number', 'end'],
+                'signed': ['end', 'end', 'in_number', 'end'],
+                'in_number': ['end', 'end', 'in_number', 'end'],
+                'end': ['end', 'end', 'end', 'end'],
+            }  # 状态转移列表
+    
+        def get_col(self, c):
+            if c.isspace():
+                return 0 
+            elif c in ['+', '-']:
+                return 1
+            elif c.isdigit():
+                return 2
+            return 3 
+        
+        def get(self, c):
+            self.state = self.table[self.state][self.get_col(c)]  # 从一个状态转移到另一个状态
+            if self.state == "in_number":
+                self.ans = self.ans * 10 + int(c)
+                self.ans = min(self.ans, self.INT_MAX) if self.sign == 1 else min(self.ans, -self.INT_MIN)
+            elif self.state == "signed":
+                self.sign = 1 if c == '+' else -1
+    
+    
+    class Solution:
+        def myAtoi(self, s: str) -> int:
+            """自动机"""
+            automaton = Automaton()
+            for c in s:
+                automaton.get(c)
+            return automaton.sign * automaton.ans
+
