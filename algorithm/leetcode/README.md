@@ -559,3 +559,51 @@ Linked: https://leetcode-cn.com/problems/string-to-integer-atoi/
                 automaton.get(c)
             return automaton.sign * automaton.ans
 
+## LeetCode-14. 最长公共前缀
+
+Linked: https://leetcode-cn.com/problems/longest-common-prefix/
+
+代码实现:
+
+    class Solution:
+        def longestCommonPrefix_(self, strs: List[str]) -> str:
+            """横向扫描寻找最大前缀"""
+            # 用 LCP(s1, s2, ..., sn)表示字符串s1, ... sn最长公共前缀
+            # LCP(s1, s2, ..., sn) = LCP(LCP(LCP(S1, S2), S3), ... Sn)
+            if not strs:
+                return str()
+            prefix, count = strs[0], len(strs)
+            for i in range(1, count):
+                prefix = self.lcp(prefix, strs[i])
+                if not prefix:
+                    # 没有交集, 直接退出返回
+                    break
+            return prefix 
+        
+        def lcp(self, str1, str2):
+            """求解两个字符串的最大公共前缀"""
+            min_len = min(len(str1), len(str2))
+            index = 0
+            while index < min_len:
+                if str1[index] == str2[index]:
+                    index += 1 
+                else:
+                    break 
+            
+            return str1[:index]
+    
+        def longestCommonPrefix(self, strs: List[str]) -> str:
+            """纵向扫描寻找最大前缀"""
+            if not strs:
+                return ""
+            
+            length, count = len(strs[0]), len(strs)
+            for i in range(length):
+                c = strs[0][i]  # 依次扫描字符串1的每个字符
+                if any(i == len(strs[j]) or strs[j][i] != c for j in range(1, count)):
+                    # 依次去每个字符串的第i个字符与字符串1的第i个字符比较, 
+                    # 或者某个字符串已经访问到最后一个元素
+                    return strs[0][:i]
+            
+            return strs[0]  # 第一个字符串为最长公共前缀
+        
