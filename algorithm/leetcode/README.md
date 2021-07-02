@@ -606,4 +606,55 @@ Linked: https://leetcode-cn.com/problems/longest-common-prefix/
                     return strs[0][:i]
             
             return strs[0]  # 第一个字符串为最长公共前缀
+
+## LeetCode-15. 三数之和
+
+Linked: https://leetcode-cn.com/problems/3sum/
+
+代码实现:
+
+    class Solution:
+        def threeSum(self, nums: List[int]) -> List[List[int]]:
+            """排序+双指针法，固定左边界记为k"""
+            n = len(nums)
+            if n < 3:
+                return [] 
+            nums = sorted(nums)  # 排序，所有负数都在左边
+            # print(nums)
+            
+            res = []  # 存储结果列表
+            k = 0  # 存储最左边元素的索引
+            for k in range(n-2):  # 去除i(中间), j(右边)两个元素
+                if nums[k] > 0:
+                    break  # 没有满足条件子数组
+                if k > 0 and nums[k] == nums[k-1]:
+                    continue  # 连续相同元素
+                i, j = k + 1, n - 1  # 双指针位置
+                while i < j:
+                    # 扫描到相同位置直接退出
+                    s = nums[k] + nums[i] + nums[j]
+                    if s < 0:
+                        i += 1 
+                        while i < j and nums[i] == nums[i-1]:
+                            # 相同元素， 左边界持续移动
+                            i += 1
+                    elif s > 0:
+                        j -= 1
+                        while i < j and nums[j] == nums[j+1]:
+                            # 相同元素， 右边界持续移动
+                            j -= 1 
+                    else:
+                        res.append([nums[k], nums[i], nums[j]])
+    
+                        # 同时移动
+                        i += 1
+                        j -= 1
+                        while i < j and nums[i] == nums[i - 1]: 
+                            i += 1
+                        while i < j and nums[j] == nums[j + 1]: 
+                            j -= 1
+            
+            return res 
+    
+            
         
