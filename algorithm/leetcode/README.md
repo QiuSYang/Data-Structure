@@ -654,7 +654,55 @@ Linked: https://leetcode-cn.com/problems/3sum/
                         while i < j and nums[j] == nums[j + 1]: 
                             j -= 1
             
-            return res 
-    
+            return res
+
+## LeetCode-28. 实现 strStr()
+
+Linked: https://leetcode-cn.com/problems/implement-strstr/
+
+代码实现:
+
+    class Solution:
+        def strStr_(self, haystack: str, needle: str) -> int:
+            """暴力匹配 --- 超时"""
+            if not needle:
+                return 0 
+            n, m = len(haystack), len(needle)
+            for i in range(n-m+1):  
+                # 去除目标字符串的长度, +1代表最后一组的起始位置
+                flag = True 
+                for j in range(m):
+                    if haystack[i+j] != needle[j]:
+                        # 以i下标开头的子串不匹配
+                        flag = False
+                        break
+                if flag:
+                    return i 
             
+            return -1  # 没有匹配子串
+        
+        def strStr(self, haystack: str, needle: str) -> int:
+            """Knuth-Morris-Pratt 算法"""
+            n, m = len(haystack), len(needle)
+            if m == 0:
+                return 0 
+            pi = [0 for _ in range(m)]
+            j = 0
+            for i in range(1, m):
+                while j > 0 and needle[i] != needle[j]:
+                    j = pi[j-1]
+                if needle[i] == needle[j]:
+                    j += 1 
+                pi[i] = j 
+    
+            j = 0 
+            for i in range(n):
+                while j > 0 and haystack[i] != needle[j]:
+                    j = pi[j-1]
+                if haystack[i] == needle[j]:
+                    j += 1 
+                if j == m:
+                    return i - m + 1 
+            
+            return -1
         
